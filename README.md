@@ -23,8 +23,6 @@ It also supports DAT files for cross-referencing your collection against a No-In
 
 Multiple URLs can be combined in a single fetch — useful when a collection is split across multiple archive.org items or sources. Just paste one URL per line.
 
-> **Note:** lolroms.com is an intermittent service. If it's down, archive.org works independently.
-
 ---
 
 ## Requirements
@@ -150,7 +148,6 @@ Extension matching is done without the file extension, so `Game (USA).zip` corre
 
 ## Known Limitations
 
-- **lolroms.com** support is included but that site is intermittent — archive.org is the primary source
 - DAT verification is not supported (DAT hashes are for uncompressed ROMs)
 - No GUI for managing `.bad` files (files that failed verification) — delete them manually to trigger a re-download
 
