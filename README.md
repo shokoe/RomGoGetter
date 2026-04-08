@@ -1,4 +1,4 @@
-# RomGoGetter v0.6
+# RomGoGetter v0.7
 
 A 1G1R ROM downloader and curator for ROM preservation sites including [archive.org](https://archive.org) and [lolroms.com](https://lolroms.com).
 
@@ -96,6 +96,8 @@ The table shows all files colour-coded:
 Click any **card** or **legend item** to cycle through rows of that type.
 
 Use the **Search** bar to filter the list as you type.
+
+Use the **Type filter** to select specific extensions (comma separated) OR as a regex selection when special charecters are included.
 
 In **DAT mode**, browse a DAT file to cross-reference. Files found in the source show green, files in the DAT but missing from the source show red. Click the Missing card to cycle through missing entries — useful for finding alternative versions manually.
 
