@@ -166,4 +166,4 @@ Extension matching is done without the file extension, so `Game (USA).zip` corre
 <img width="1151" height="1176" alt="image" src="https://github.com/user-attachments/assets/3476a734-980a-413a-bc09-3f07bc7a0a13" />
 
 
-*By Shoko, 2026*
+*By Shoko*
