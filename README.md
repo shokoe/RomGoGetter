@@ -1,4 +1,4 @@
-# RomGoGetter v0.5
+# RomGoGetter v0.6
 
 A 1G1R ROM downloader and curator for ROM preservation sites including [archive.org](https://archive.org) and [lolroms.com](https://lolroms.com).
 
@@ -109,6 +109,7 @@ In **DAT mode**, browse a DAT file to cross-reference. Files found in the source
 - Click **Start** and confirm
 - Downloads resume from `.part` files if interrupted — just run again
 - Progress bar reflects already-completed files from previous runs
+- Variables are dynamic
 
 ---
 
