@@ -161,5 +161,9 @@ Extension matching is done without the file extension, so `Game (USA).zip` corre
 - [Redump DATs](http://redump.org) — for disc-based systems
 
 ---
+<img width="1145" height="1175" alt="image" src="https://github.com/user-attachments/assets/e671a865-f5cf-4dd4-9ef1-ff5a60100772" />
+<img width="1144" height="1174" alt="image" src="https://github.com/user-attachments/assets/89c37595-3bfd-4809-b85d-9c4181c95f03" />
+<img width="1151" height="1176" alt="image" src="https://github.com/user-attachments/assets/3476a734-980a-413a-bc09-3f07bc7a0a13" />
+
 
 *By Shoko, 2026*
