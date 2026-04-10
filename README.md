@@ -1,4 +1,4 @@
-# RomGoGetter v0.7
+# RomGoGetter v0.8
 
 A 1G1R ROM downloader and curator for ROM preservation sites including [archive.org](https://archive.org) and [lolroms.com](https://lolroms.com).
 
