@@ -4,17 +4,29 @@ RomGoGetter started as a 1G1R direct HTTP downloader for archive.org, but has si
 
 ---
 
+## Usage
+
+```
+python RomGoGetter_v0.9.pyw
+```
+
+Or double-click the `.pyw` file on Windows.
+
+---
+
 ## Sources
 
 - **archive.org** — paste one or more collection URLs; files are fetched directly via HTTP with S3 key support for faster speeds
 - **lolroms.com** — full category page support including Wayback Machine archived pages
-- **Minerva Archive** — paste a browse URL (`minerva-archive.org/browse/...`) or save the page locally as HTML if Cloudflare is blocking you; the matching torrent is detected automatically
+- **Minerva Archive** — paste a browse URL (`minerva-archive.org/browse/...`)
 
-Multiple source URLs can be combined in the URL box — RomGoGetter fetches and merges them all.
+Multiple source URLs can be combined in the URL box — RomGoGetter fetches and merges them all. Examples are included and you can add your own groups.
 
 ---
 
 ## Selection
+
+Source filenames must be in no-intro/redump format!
 
 - **1G1R** — picks the single best version of each game: English > western > any non-excluded fallback
 - **1G1R English only** — same as 1G1R but restricts selection to English-speaking countries (USA, UK, Europe, Australia, Canada, NZ, Ireland); games only available in non-English-speaking countries are shown in red
@@ -34,7 +46,7 @@ Multiple source URLs can be combined in the URL box — RomGoGetter fetches and 
 - Double-click or Space to toggle individual entries
 - Click legend items to cycle through that category
 
-**Analysis cards** show total/selected counts and sizes, non-English, and non-game totals — clickable to jump to that category.
+**Analysis cards** show total/selected counts and sizes, non-English, and non-game totals — clickable to jump to next item in category.
 
 ---
 
@@ -65,7 +77,6 @@ Multiple source URLs can be combined in the URL box — RomGoGetter fetches and 
 - Configurable: Parallel, Retries, Idle timeout
 - Export selection as DAT file (No-Intro/Redump format)
 - Group save/load — save and recall sets of URLs
-- Destination + Additional Local Source on the same row
 - Source-aware donate button:
   - archive.org → Donate to the Internet Archive
   - lolroms → Donate to lolroms.com
@@ -82,15 +93,6 @@ Multiple source URLs can be combined in the URL box — RomGoGetter fetches and 
 
 ---
 
-## Usage
-
-```
-python RomGoGetter_v0.9.pyw
-```
-
-Or double-click the `.pyw` file on Windows.
-
----
 
 ## License
 
