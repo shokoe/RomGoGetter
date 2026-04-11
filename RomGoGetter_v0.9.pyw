@@ -2363,6 +2363,16 @@ class App:
         import subprocess, re as _re, shutil
         self._debug(f"_start_aria2c_downloads: {len(to_download)} files")
 
+        # Clean up any leftover thread dirs from previous runs
+        import shutil as _shutil
+        try:
+            for entry in os.scandir(dest_dir):
+                if entry.is_dir() and entry.name.startswith('thread_'):
+                    try: _shutil.rmtree(entry.path, ignore_errors=True)
+                    except: pass
+        except Exception:
+            pass
+
         max_par      = self.parallel.get()
         max_ret      = self.retries.get()
         total_files  = len(to_download)
@@ -2479,6 +2489,8 @@ class App:
                         shutil.copy2(found, dst)
                         self.complete_slot(slot, os.path.getsize(dst))
                         self._debug(f"[slot {slot}] done: {fname}")
+                        try: shutil.rmtree(thread_dir, ignore_errors=True)
+                        except: pass
                         return True, fname
                     else:
                         self._debug(f"[slot {slot}] file not found after download")
