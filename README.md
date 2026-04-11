@@ -1,4 +1,4 @@
-# RomGoGetter v0.9
+# RomGoGetter v0.9 
 
 RomGoGetter started as a 1G1R direct HTTP downloader for archive.org, but has since developed into a powerful general ROM selection and download tool — supporting multiple sources, intelligent filtering, and torrent-based downloading via the Minerva Archive.
 
