@@ -97,3 +97,11 @@ Source filenames must be in no-intro/redump format!
 ## License
 
 MIT
+
+---
+
+<img width="1149" height="1174" alt="image" src="https://github.com/user-attachments/assets/9c9b4f2d-7aac-4119-9e44-783ccfd6d92d" />
+<img width="1149" height="1179" alt="image" src="https://github.com/user-attachments/assets/497736d6-7fc5-4a40-94f9-43e531343a86" />
+<img width="1145" height="1174" alt="image" src="https://github.com/user-attachments/assets/0a8ca909-ff07-42b3-89fd-ee531a19cb1c" />
+
+By Shoko, 2026
