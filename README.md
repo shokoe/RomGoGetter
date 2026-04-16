@@ -127,8 +127,43 @@ Currently this is tested only on windows.
 
 ---
 
+## File layout
+
+- Python 3.10+
+- tkinter (included with standard Python on Windows)
+- **aria2c.exe** — required for Minerva downloads; place next to the `.pyw` file
+  - Download from [aria2.github.io](https://aria2.github.io/)
+```
+RomGoGetter_v0.13.pyw        # main script
+aria2c.exe                   # bundled, for Minerva downloads (Windows)
+RomGoGetter_settings.json    # auto-created, persists all settings
+RomGoGetter_groups.json      # auto-created, persists URL groups
+RomGoGetter_dat_groups.json  # auto-created, persists DAT groups
+```
+
+---
+
+## Credits
+
+- **[Internet Archive](https://archive.org)** — the world's library. [Donate](https://archive.org/donate)
+- **[Myrient](https://myrient.erista.me)** — the team behind the Minerva Archive. [Memorial](https://minerva-archive.org/memorial/)
+- **[lolroms.com](https://lolroms.com)** — [Donate](https://www.paypal.com/donate/?hosted_button_id=EG4YN6QGHCB6C)
+- **[RetroAchievements](https://retroachievements.org)** — achievements and top lists for retro games
+- **[IGDB](https://www.igdb.com)** — game database by Twitch
+
+---
+
 ## License
 
 MIT — see [LICENSE](LICENSE)
 
 © 2026 Shoko
+
+---
+
+<img width="1091" height="958" alt="image" src="https://github.com/user-attachments/assets/38d02881-0e07-475f-95f9-40b772f12f97" />
+<img width="1086" height="961" alt="image" src="https://github.com/user-attachments/assets/f45c9294-a90a-4b7c-bd09-8d01231c3bee" />
+<img width="1089" height="965" alt="image" src="https://github.com/user-attachments/assets/9aa43e7b-8a2d-4c39-bde7-e584b160f147" />
+
+
+
