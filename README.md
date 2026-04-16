@@ -1,18 +1,117 @@
-# RomGoGetter v0.13
+# RomGoGetter v0.14
 
-A ROM downloader and curator for **archive.org**, **lolroms.com**, and **Minerva Archive**. Fetches file listings from public ROM sources, applies smart filtering — 1G1R, DAT matching, RetroAchievements top lists, IGDB critic rankings — and downloads only the files you actually want. Every mode supports manual selection nmodification by doubleclicking the individual files or prressing space, toggling selection.
+**ROM curator and downloader for archive.org, lolroms.com, Minerva, and local collections.**
 
-> ⚠ This app is not a torrents client and therefor doesn't seed. If you download from Minerva, please use a proper torrent client to seed back to the community.
+RomGoGetter started as a 1G1R tool — pick the best regional variant of each game and skip the rest. It has since grown into a full ROM curation pipeline: pull file listings from multiple sources, apply smart filtering to build exactly the collection you want, then download or copy only what's needed.
+
+---
+
+## Sources
+
+- **archive.org** — fetches the file listing from any public (or credentialed) Internet Archive collection; supports S3 keys for access-restricted collections; works with "show all" and zip content pages
+- **lolroms.com** — scrapes file listings and direct download URLs from category pages, including Wayback Machine snapshots
+- **Minerva / Myrient** — downloads individual files from collection torrents via a full `aria2c` wrapper
+- **Local directory** — scans a folder on disk and treats it as a source; local files are preferred over remote when the same filename exists in both. Enables using RomGoGetter as a **smart copy tool**: curate a large local collection down to a filtered subset in a new folder
+- **Multiple sources at once** — paste multiple URLs (one per line); listings are merged into a single pool before filtering
+
+---
+
+## Selection
+
+### 1G1R
+The core mode. For each game title, picks one ROM: English preferred, highest revision, most language tracks. Excludes demos, kiosk builds, betas, prototypes, and non-game discs automatically.
+
+### Modes
+
+| Mode | Description |
+|------|-------------|
+| `1G1R English only` | One ROM per game, English/Western regions only, prefers multiple lanuages |
+| `1G1R` | One ROM per game, best available region |
+| `All files` | Every game rom file selected |
+| `None` | All files shown, none pre-selected — toggle manually |
+| `DAT` | Cross-reference against a No-Intro / Redump DAT local or remote file; matched files selected, unmatched shown as missing |
+| `Top N` | Filter by a ranked game list — see below |
+
+### Top N
+Fetches a ranked list of games from an external source and maps them to your ROM pool using fuzzy/token title matching, then applies 1G1R within each matched group.
+
+**Sources:** RetroAchievements (player count), IGDB (aggregate rating)
+
+**Filter options:**
+- **Top N** — take the N highest-ranked games
+- **Min score** — take all games above a score threshold
+- **Max size GB** — limit selection by commulative size
+
+### DAT Group
+Apply multiple DAT files simultaneously (local paths or URLs). Useful for cross-referencing against a curated list spanning several platforms or sets.
+
+### Manual override
+Double-click any file in the Analysis tab to toggle it in or out of the download queue. The selected size card updates live.
+
+### Missing files
+A title is shown as **Missing** (red) when it was matched to a ROM in the file listing but that ROM is not available — not present in the local source and not reachable remotely. Titles with no fuzzy match and titles trimmed by a size budget are not counted as missing.
+
+---
+
+## Download
+
+- **Parallel slots** — up to 20 simultaneous downloads, adjustable live while downloading
+- **Resume** — partial `.part` and torrented files are resumed automatically on retry
+- **Stuck detection** — configurable idle timeout cancels and retries hung connections
+- **Verification before skipping:**
+
+| Mode | Behaviour |
+|------|-----------|
+| `Overwrite` | Always re-download |
+| `Name` | Skip if file exists |
+| `Size` | Skip if file exists and size matches |
+| `Hash` | Skip if MD5 matches archive.org metadata; falls back to size; slow |
+
+- **Local copy** — files sourced from a local directory are copied instead of downloaded, skipped if destination size already matches
+- **Minerva torrents** — uses `aria2c` to fetch individual files by torrent index without downloading the full archive; temp torrent files are cleaned up after
+- **Export DAT** — export the current selection as a No-Intro compatible DAT file
+
+---
+
+## Usage
+
+### Basic 1G1R download from archive.org
+
+1. Paste an archive.org collection URL(s) into **Source URLs**
+2. Set a **Destination** folder
+3. Choose a **Mode** (default: `1G1R English only`)
+4. Click **GoGet!** — the Analysis tab shows what will be downloaded
+5. Click **Download**
+
+### Top N by size budget
+
+1. Set source URL(s) and destination
+2. Set Mode to `Top N`
+3. In the Analysis tab, select source, platform, and **Max size GB**
+4. Click **Fetch & Apply** — pages are fetched one at a time, full 1G1R selection is run after each page, and fetching stops as soon as the budget is reached
+5. Click **Download**
+
+### Smart copy from local collection
+
+1. Set **Additional Local Source** to your existing ROM directory
+2. Leave Source URLs blank (or add a URL source to fill in files missing locally)
+3. Set **Destination** to a new folder
+4. Click **GoGet!** — local files appear in the list with exact sizes, preferred over remote
+5. Apply Top N or 1G1R filtering, then click **Download** to copy selected files
+
+### Minerva/Myrient
+
+1. Paste a Minerva browse URL
+2. This uses the bundled `aria2c.exe`
+3. A torrent warning banner is shown as a reminder to seed via a proper torrent client
 
 ---
 
 ## Requirements
 
-- **Python 3.10+**
-- **tkinter** — included with standard Python on Windows; on some Linux distros: `sudo apt install python3-tk`
-- **aria2c** — required only for Minerva downloads. Bundled in the repository (`aria2c.exe`). Linux/Mac users can install via package manager or download from [aria2.github.io](https://aria2.github.io/)
-
-No third-party Python packages required.
+- Python 3.10+
+- tkinter (included with most Python distributions)
+- `aria2c` — required for Minerva/Myrient downloads
 
 ---
 
@@ -20,171 +119,16 @@ No third-party Python packages required.
 
 ```
 git clone https://github.com/shokoe/RomGoGetter
-python RomGoGetter_v0.13.pyw
+cd RomGoGetter
+python RomGoGetter_v0_14.pyw
 ```
 
-On Windows, `.pyw` files run without a console window by default.
-
----
-
-## Usage
-
-### Basic workflow
-
-1. **Setup tab** — paste one or more source URLs into the URL box (one per line) or use saved examples
-2. Click **GoGet!** — fetches the file listing
-3. **Analysis** -  Choose a **Mode** at the top to apply the selected mode
-4. Insert additional data as needed.
-5. Review the selection — toggle individual files by double-clicking or pressing Space
-6. Click **Download**
-7. Click **Start**
-
-### URL formats supported
-
-```
-# Internet Archive collection page ("Show all")
-https://archive.org/download/No-Intro-Nintendo-DS
-
-# lolroms.com category page
-https://lolroms.com/Nintendo-DS/
-
-# Minerva Archive browse page
-https://minerva-archive.org/browse/No-Intro/Nintendo%20-%20Nintendo%20DS/
-```
-
-Multiple URLs of the same or different source types can be combined in the URL box.
-
-### URL Groups
-Save and recall named sets of URLs using the group dropdown in the Setup tab — useful for collections you return to regularly.
-
-### Internet Archive S3 Keys
-Optional — only needed for access-restricted collections. Get your keys at [archive.org/account/s3.php](https://archive.org/account/s3.php). The key frame only appears when an archive.org URL is detected.
-
-### Minerva / aria2c
-For Minerva sources, the Download button triggers aria2c to download via torrent. Each browse URL maps to its own torrent — if you have multiple Minerva URLs, all their torrents are fetched and matched. Files already present in the destination are skipped automatically.
-
-**Please seed back** — this app sets `--seed-time=0` and exits aria2c immediately after each file completes, with what this app is aimed for, any other option would be unrealistic. Open the torrent (saved in the target dir) in a proper torrent client to give back to the community.
-
-`aria2c.exe` is bundled in the repository. Linux/Mac users should place an `aria2c` binary next to the script or have it on PATH.
-
----
-
-## Features
-
-### Sources
-- **Internet Archive (archive.org)** — direct HTTP downloads with S3 key support for access-restricted collections, MD5 hash verification, ETag-based skip-if-unchanged, and resume support
-- **lolroms.com** — scrapes the file listing and downloads directly
-- **Minerva Archive** — individual files torrent-based downloads via aria2c, with per-collection torrent detection and multi-URL support (each browse URL has its own torrent)
-- Multiple URLs can be combined — useful for split collections (e.g. a main set + an aftermarket/private subset)
-
-### Selection Modes
-| Mode | Description |
-|------|-------------|
-| **1G1R English only** | One game, one ROM — English language filtered, best revision |
-| **1G1R** | One game, one ROM — any Western region, best revision |
-| **All files** | No filtering, download everything |
-| **None** | Show all files unselected — pick manually |
-| **DAT** | Cross-reference against one or more No-Intro / Redump DAT files |
-| **RA Top** | Top N games by RetroAchievements player count for a given console |
-| **IGDB Top** | Top N games by IGDB aggregated critic score for a given platform |
-
-### 1G1R Logic
-- Prefers English language (`En` tag) → Western region → highest revision number → most languages
-- Handles multi-disc games correctly — each disc gets its own 1G1R group, all discs of the winning variant are selected together
-- Excludes demos, kiosks, betas, alphas, prototypes, samples, magazines, and covermounts automatically
-- Article normalization for grouping (strips "The", "Le", "Die", "El" etc. in multiple languages)
-
-### DAT Mode
-- Load local DAT files or fetch from URLs (No-Intro, Redump, or any XML DAT)
-- Named DAT groups — save and recall sets of DAT URLs with one click
-- Extension-stripped matching — matches archive filenames to DAT entries regardless of format differences
-- Missing entries shown in red; matched entries shown in green
-
-### RetroAchievements Top N
-- Fetches the RA leaderboard for any supported console directly from the source Google Sheet
-- Fuzzy title matching with descending threshold (1.0 → 0.70) to handle naming variations
-- English-first matching with non-English fallback for Japan-exclusive titles
-- 1G1R applied within each matched title group
-- Works great for Nintendo platforms where critic score data is sparse
-
-### IGDB Top N
-- Uses the IGDB API (Twitch credentials embedded) — no user setup required
-- Fetches platforms dynamically on first use
-- Sorts by aggregated critic rating (Metacritic etc.)
-- Works best for platforms with good critic coverage (PS1, PS2, Xbox, PC etc.)
-- Same fuzzy matching + 1G1R logic as RA Top
-
-### Downloads
-- Parallel HTTP downloads with up to 20 configurable slots
-- Per-slot progress bars with speed, ETA, and file size
-- Pause / resume mid-session
-- Stuck download detection and automatic retry (configurable timeout and retry count)
-- MD5 hash verification against archive.org metadata API
-- ETag cache — skips files that haven't changed since last download
-- Size cache — fast re-run skip without re-fetching metadata
-- Local source folder — copies from a local directory before downloading, saving bandwidth
-- aria2c integration for Minerva torrent downloads with `--select-file` per-file control
-
-### Analysis Tab
-- Sortable, searchable file list with colour-coded status (selected / unselected / non-English / non-game)
-- Click legend items to cycle through filter states
-- Type filter with regex support
-- Stat cards: total titles, total size, selected ROMs, selected size, non-English count, non-game count
-- Export to DAT — generate a No-Intro compatible XML DAT of your selected files
-- Live re-filtering — switch modes without re-fetching
-
-### Settings Persistence
-All settings survive restarts and the Reset button:
-- URLs and selected URL group
-- Destination folder and local source folder
-- S3 access/secret keys
-- Download options (parallel slots, retries, stuck timeout, aria2c split, speed limit)
-- Verification mode, analysis mode
-- RA console selection and Top N value
-- IGDB platform selection and Top N value
-- DAT group selection and URLs
-- Window geometry
-
----
-
-## File layout
-
-```
-RomGoGetter_v0.13.pyw        # main script
-aria2c.exe                   # bundled, for Minerva downloads (Windows)
-RomGoGetter_settings.json    # auto-created, persists all settings
-RomGoGetter_groups.json      # auto-created, persists URL groups
-RomGoGetter_dat_groups.json  # auto-created, persists DAT groups
-```
-
----
-
-## Credits
-
-- **[Internet Archive](https://archive.org)** — the world's library. [Donate](https://archive.org/donate)
-- **[Myrient](https://myrient.erista.me)** — the team behind the Minerva Archive. [Memorial](https://minerva-archive.org/memorial/)
-- **[lolroms.com](https://lolroms.com)** — [Donate](https://www.paypal.com/donate/?hosted_button_id=EG4YN6QGHCB6C)
-- **[RetroAchievements](https://retroachievements.org)** — achievements and top lists for retro games
-- **[IGDB](https://www.igdb.com)** — game database by Twitch
+Currently this is tested only on windows.
 
 ---
 
 ## License
 
-MIT — see LICENSE file for details.  
-Copyright © 2026 Shoko
+MIT — see [LICENSE](LICENSE)
 
----
-
-Source:
-
-<img width="1149" height="1174" alt="image" src="https://github.com/user-attachments/assets/9c9b4f2d-7aac-4119-9e44-783ccfd6d92d" />
-
-Selection:
-
-<img width="1149" height="1179" alt="image" src="https://github.com/user-attachments/assets/497736d6-7fc5-4a40-94f9-43e531343a86" />
-
-Download:
-
-<img width="1145" height="1174" alt="image" src="https://github.com/user-attachments/assets/0a8ca909-ff07-42b3-89fd-ee531a19cb1c" />
-
+© 2026 Shoko
