@@ -2,7 +2,7 @@
 
 **ROM curator and downloader for archive.org, lolroms.com, Minerva, and local collections. It helps you to download only the roms you want from larger romsets.**
 
-RomGoGetter started as a 1G1R tool — pick the best regional variant of each game and skip the rest. It has since grown into a full ROM curation pipeline: pull file listings from multiple sources, apply smart filtering to build exactly the collection you want, then download or copy only what's needed.
+RomGoGetter started as a 1G1R tool — pick the best regional variant of each game and skip the rest. It has since grown into a full ROM curation pipeline: pull no-intro and redump listings from multiple repositories, apply smart filtering to build exactly the collection you want, then download or copy only what's needed.
 
 ---
 
