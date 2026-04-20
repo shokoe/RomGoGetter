@@ -1,8 +1,17 @@
-# RomGoGetter v0.14
+# RomGoGetter v0.15
 
 **ROM curator and downloader for archive.org, lolroms.com, Minerva, and local collections. It helps you to download only the roms you want from larger romsets.**
 
 RomGoGetter started as a 1G1R tool — pick the best regional variant of each game and skip the rest. It has since grown into a full ROM curation pipeline: pull no-intro and redump listings from multiple repositories, apply smart filtering to build exactly the collection you want, then download or copy only what's needed.
+
+---
+
+## Updates
+- Parallel fetch in setup
+- Faster metadata fetch from IA
+- Fixed a major IA URL bug that caused 404 error on download
+- Font size controls
+- Major site added to 'Top N' with genre selection support
 
 ---
 
