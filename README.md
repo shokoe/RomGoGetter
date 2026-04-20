@@ -6,7 +6,7 @@ RomGoGetter started as a 1G1R tool — pick the best regional variant of each ga
 
 ---
 
-## Updates
+## v0.15 Updates
 - Parallel fetch in setup
 - Faster metadata fetch from IA
 - Fixed a major IA URL bug that caused 404 error on download
