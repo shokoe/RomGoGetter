@@ -1,4 +1,4 @@
-# RomGoGetter v0.16
+# RomGoGetter v0.17
 
 **ROM curator and downloader for archive.org, lolroms.com, Minerva, and local collections. It helps you to download only the roms you want from larger romsets.**
 
@@ -6,8 +6,95 @@ RomGoGetter started as a 1G1R tool — pick the best regional variant of each ga
 
 ---
 
+## Requirements
+
+- Python 3.10+
+- tkinter (included with most Python distributions)
+- `aria2c` — required for Minerva/Myrient downloads
+- `cloudscraper` — required for Eden/EmuReady compatibility (`pip install cloudscraper`)
+- `rapidfuzz` — optional but strongly recommended for Top N matching speed (`pip install rapidfuzz`)
+
+---
+
+## Installation
+
+```
+git clone https://github.com/shokoe/RomGoGetter
+cd RomGoGetter
+python RomGoGetter_v0_17.pyw
+```
+
+Currently tested only on Windows.
+
+---
+
+## Usage Examples
+
+### Basic 1G1R download from archive.org
+
+1. Setup tab
+  a. Paste or select an archive.org collection URL(s) into **Source URLs / Local Dirs**
+  b. Set a **Destination** folder
+  c. Click on GoGet!
+2. Selection tab
+  a. Choose a **Mode**: `1G1R English only`
+  b. Review selection and add or remove specific roms
+  c. Click on **Cmopatibility** to filter by emulator compatibility lists or go straight to **Download**
+3. Compatibility tab
+  a. Choose the correct emaulator and click on **Fetch**
+  b. Deselect groups by cards or use **Deselect below**
+  c. Click on Download
+4. Download tab
+  a. Modify downdload settings
+  b. Click on **Start**
+5. Make coffeee and gaze at the dowloads ;)
+
+### Top N by size budget
+
+1. Set source URL(s) and destination
+2. Set Mode to `Top N`
+3. In the Selection tab, select source, platform, and **Max size GB**
+4. Click **Fetch & Apply** — pages are fetched one at a time, full 1G1R selection is run after each page, and fetching stops as soon as the budget is reached
+5. Click **Download**
+
+### Smart copy from local collection
+
+1. Paste your existing ROM directory path into **Source URLs / Local Dirs** (enable **Recursive** if files are in subdirectories)
+2. Set **Destination** to a new folder
+3. Click **GoGet!** — local files appear in the list with exact sizes
+4. Apply Top N or 1G1R filtering, then click **Download** to copy selected files
+
+### Eden (Switch) compatibility
+
+1. Go to the **Compatibility** tab
+2. Select **Eden (Switch)** as emulator
+3. Click **Fetch Compatibility** — fetches from EmuReady, paginated, best score per title across all device reports
+4. Requires `cloudscraper` (`pip install cloudscraper`)
+
+### Minerva/Myrient
+
+1. Paste a Minerva browse URL
+2. This uses the bundled `aria2c.exe`
+3. A torrent warning banner is shown as a reminder to seed via a proper torrent client
+
+---
+
+## v0.17 Updates
+Added compatebility check step for leading emulators!
+
+### Selection Tab
+- **Search now supports glob and regex** — plain text = substring match, `*`/`?` wildcards = glob, any regex special character (`.`, `+`, `[`, etc.) = regex
+- **`+` / `-` / `🕸` bulk selection buttons** — `+` selects all visible rows in the current search, `-` deselects them (without touching rows outside the search), `🕸` selects only visible rows and deselects everything else
+- **`Source URLs / Local Dirs`** — the URL input now accepts local directory paths alongside archive.org URLs, one per line; mixed sources are merged into a single pool
+- **Recursive checkbox** — when enabled, local directory scans walk subdirectories; otherwise only the root is scanned
+
+### Top N Mode
+- Optimized matching speed
+
+---
+
 ## v0.16 Updates
-- Added support for TeknoParrot latest rom selection. The english only option doesn't work (and will not) so use the regex field to filter out Japan releases with ^(?!.*\(Japan\)). You can also filter only the newst by year (i.e since 2020 - 20[2][0-9])
+- Added support for TeknoParrot latest rom selection. The english only option doesn't work (and will not) so use the regex field to filter out Japan releases with `^(?!.*\(Japan\))`. You can also filter only the newest by year (i.e since 2020 - `20[2][0-9]`)
 
 ## v0.15 Updates
 - Parallel fetch in setup
@@ -23,8 +110,8 @@ RomGoGetter started as a 1G1R tool — pick the best regional variant of each ga
 - **archive.org** — fetches the file listing from any public (or credentialed) Internet Archive collection; supports S3 keys for access-restricted collections; works with "show all" and zip content pages
 - **lolroms.com** — scrapes file listings and direct download URLs from category pages, including Wayback Machine snapshots
 - **Minerva / Myrient** — downloads individual files from collection torrents via a full `aria2c` wrapper
-- **Local directory** — scans a folder on disk and treats it as a source; local files are preferred over remote when the same filename exists in both. Enables using RomGoGetter as a **smart copy tool**: curate a large local collection down to a filtered subset in a new folder
-- **Multiple sources at once** — paste multiple URLs (one per line); listings are merged into a single pool before filtering
+- **Local directory** — paste a local folder path directly into the Source URLs input (one per line); local files are preferred over remote when the same filename exists in both. Enables using RomGoGetter as a **smart copy tool**: curate a large local collection down to a filtered subset in a new folder. Enable **Recursive** to scan subdirectories
+- **Multiple sources at once** — paste multiple URLs and/or local paths (one per line); listings are merged into a single pool before filtering
 
 ---
 
@@ -37,31 +124,36 @@ The core mode. For each game title, picks one ROM: English preferred, highest re
 
 | Mode | Description |
 |------|-------------|
-| `1G1R English only` | One ROM per game, English/Western regions only, prefers multiple lanuages |
+| `1G1R English only` | One ROM per game, English/Western regions only, prefers multiple languages |
 | `1G1R` | One ROM per game, best available region |
-| `All files` | Every game rom file selected |
+| `All files` | Every game ROM file selected |
 | `None` | All files shown, none pre-selected — toggle manually |
 | `DAT` | Cross-reference against a No-Intro / Redump DAT local or remote file; matched files selected, unmatched shown as missing |
 | `Top N` | Filter by a ranked game list — see below |
 
 ### Top N
-Fetches a ranked list of games from an external source and maps them to your ROM pool using fuzzy/token title matching, then applies 1G1R within each matched group.
-
-**Sources:** RetroAchievements (player count), IGDB (aggregate rating)
+Fetches a ranked list of games from various well-known external source and maps them to your ROM pool using fuzzy/token title matching, then applies 1G1R within each matched group.
 
 **Filter options:**
 - **Top N** — take the N highest-ranked games
 - **Min score** — take all games above a score threshold
-- **Max size GB** — limit selection by commulative size
+- **Max size GB** — limit selection by cumulative size
 
 ### DAT Group
 Apply multiple DAT files simultaneously (local paths or URLs). Useful for cross-referencing against a curated list spanning several platforms or sets.
 
+### Bulk selection shortcuts
+| Button | Action |
+|--------|--------|
+| `+` | Select all visible rows (doesn't touch others) |
+| `-` | Deselect all visible rows (doesn't touch others) |
+| `🕸` | Select visible, deselect everything else |
+
 ### Manual override
-Double-click any file in the Analysis tab to toggle it in or out of the download queue. The selected size card updates live.
+Double-click any file in the Selection tab to toggle it in or out of the download queue. The selected size card updates live.
 
 ### Missing files
-A title is shown as **Missing** (red) when it was matched to a ROM in the file listing but that ROM is not available — not present in the local source and not reachable remotely. Titles with no fuzzy match and titles trimmed by a size budget are not counted as missing.
+A title is shown as **Missing** (red `✗`) when it was matched to a ROM in the file listing but that ROM is not available — not present in the local source and not found remotely. Missing rows cannot be selected.
 
 ---
 
@@ -85,69 +177,11 @@ A title is shown as **Missing** (red) when it was matched to a ROM in the file l
 
 ---
 
-## Usage
-
-### Basic 1G1R download from archive.org
-
-1. Paste an archive.org collection URL(s) into **Source URLs**
-2. Set a **Destination** folder
-3. Choose a **Mode** (default: `1G1R English only`)
-4. Click **GoGet!** — the Analysis tab shows what will be downloaded
-5. Click **Download**
-
-### Top N by size budget
-
-1. Set source URL(s) and destination
-2. Set Mode to `Top N`
-3. In the Analysis tab, select source, platform, and **Max size GB**
-4. Click **Fetch & Apply** — pages are fetched one at a time, full 1G1R selection is run after each page, and fetching stops as soon as the budget is reached
-5. Click **Download**
-
-### Smart copy from local collection
-
-1. Set **Additional Local Source** to your existing ROM directory
-2. Leave Source URLs blank (or add a URL source to fill in files missing locally)
-3. Set **Destination** to a new folder
-4. Click **GoGet!** — local files appear in the list with exact sizes, preferred over remote
-5. Apply Top N or 1G1R filtering, then click **Download** to copy selected files
-
-### Minerva/Myrient
-
-1. Paste a Minerva browse URL
-2. This uses the bundled `aria2c.exe`
-3. A torrent warning banner is shown as a reminder to seed via a proper torrent client
-
----
-
-## Requirements
-
-- Python 3.10+
-- tkinter (included with most Python distributions)
-- `aria2c` — required for Minerva/Myrient downloads
-
----
-
-## Installation
-
-```
-git clone https://github.com/shokoe/RomGoGetter
-cd RomGoGetter
-python RomGoGetter_v0_14.pyw
-```
-
-Currently this is tested only on windows.
-
----
-
 ## File layout
 
-- Python 3.10+
-- tkinter (included with standard Python on Windows)
-- **aria2c.exe** — required for Minerva downloads; place next to the `.pyw` file
-  - Download from [aria2.github.io](https://aria2.github.io/)
 ```
-RomGoGetter_v0.13.pyw        # main script
-aria2c.exe                   # bundled, for Minerva downloads (Windows)
+RomGoGetter_v0.17.pyw        # main script
+aria2c.exe                   # required for Minerva downloads (Windows)
 RomGoGetter_settings.json    # auto-created, persists all settings
 RomGoGetter_groups.json      # auto-created, persists URL groups
 RomGoGetter_dat_groups.json  # auto-created, persists DAT groups
@@ -162,6 +196,7 @@ RomGoGetter_dat_groups.json  # auto-created, persists DAT groups
 - **[lolroms.com](https://lolroms.com)** — [Donate](https://www.paypal.com/donate/?hosted_button_id=EG4YN6QGHCB6C)
 - **[RetroAchievements](https://retroachievements.org)** — achievements and top lists for retro games
 - **[IGDB](https://www.igdb.com)** — game database by Twitch
+- **[EmuReady](https://www.emuready.com)** — community emulator compatibility tracker
 
 ---
 
@@ -176,6 +211,3 @@ MIT — see [LICENSE](LICENSE)
 <img width="1091" height="958" alt="image" src="https://github.com/user-attachments/assets/38d02881-0e07-475f-95f9-40b772f12f97" />
 <img width="1086" height="961" alt="image" src="https://github.com/user-attachments/assets/f45c9294-a90a-4b7c-bd09-8d01231c3bee" />
 <img width="1089" height="965" alt="image" src="https://github.com/user-attachments/assets/9aa43e7b-8a2d-4c39-bde7-e584b160f147" />
-
-
-
