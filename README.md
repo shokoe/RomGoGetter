@@ -1,4 +1,4 @@
-# RomGoGetter v0.17
+# RomGoGetter v0.18
 
 **ROM curator and downloader for archive.org, lolroms.com, Minerva, and local collections. It helps you to download only the roms you want from larger romsets.**
 
@@ -76,32 +76,6 @@ Currently tested only on Windows.
 1. Paste a Minerva browse URL
 2. This uses the bundled `aria2c.exe`
 3. A torrent warning banner is shown as a reminder to seed via a proper torrent client
-
----
-
-## v0.17 Updates
-Added compatebility check step for leading emulators!
-
-### Selection Tab
-- **Search now supports glob and regex** — plain text = substring match, `*`/`?` wildcards = glob, any regex special character (`.`, `+`, `[`, etc.) = regex
-- **`+` / `-` / `🕸` bulk selection buttons** — `+` selects all visible rows in the current search, `-` deselects them (without touching rows outside the search), `🕸` selects only visible rows and deselects everything else
-- **`Source URLs / Local Dirs`** — the URL input now accepts local directory paths alongside archive.org URLs, one per line; mixed sources are merged into a single pool
-- **Recursive checkbox** — when enabled, local directory scans walk subdirectories; otherwise only the root is scanned
-
-### Top N Mode
-- Optimized matching speed
-
----
-
-## v0.16 Updates
-- Added support for TeknoParrot latest rom selection. The english only option doesn't work (and will not) so use the regex field to filter out Japan releases with `^(?!.*\(Japan\))`. You can also filter only the newest by year (i.e since 2020 - `20[2][0-9]`)
-
-## v0.15 Updates
-- Parallel fetch in setup
-- Faster metadata fetch from IA
-- Fixed a major IA URL bug that caused 404 error on download
-- Font size controls
-- Major site added to 'Top N' with genre selection support
 
 ---
 
@@ -197,6 +171,37 @@ RomGoGetter_dat_groups.json  # auto-created, persists DAT groups
 - **[RetroAchievements](https://retroachievements.org)** — achievements and top lists for retro games
 - **[IGDB](https://www.igdb.com)** — game database by Twitch
 - **[EmuReady](https://www.emuready.com)** — community emulator compatibility tracker
+
+---
+
+## v0.18 Updates
+- Minor fixes
+
+---
+
+## v0.17 Updates
+Added compatebility check step for leading emulators!
+
+### Selection Tab
+- **Search now supports glob and regex** — plain text = substring match, `*`/`?` wildcards = glob, any regex special character (`.`, `+`, `[`, etc.) = regex
+- **`+` / `-` / `🕸` bulk selection buttons** — `+` selects all visible rows in the current search, `-` deselects them (without touching rows outside the search), `🕸` selects only visible rows and deselects everything else
+- **`Source URLs / Local Dirs`** — the URL input now accepts local directory paths alongside archive.org URLs, one per line; mixed sources are merged into a single pool
+- **Recursive checkbox** — when enabled, local directory scans walk subdirectories; otherwise only the root is scanned
+
+### Top N Mode
+- Optimized matching speed
+
+---
+
+## v0.16 Updates
+- Added support for TeknoParrot latest rom selection. The english only option doesn't work (and will not) so use the regex field to filter out Japan releases with `^(?!.*\(Japan\))`. You can also filter only the newest by year (i.e since 2020 - `20[2][0-9]`)
+
+## v0.15 Updates
+- Parallel fetch in setup
+- Faster metadata fetch from IA
+- Fixed a major IA URL bug that caused 404 error on download
+- Font size controls
+- Major site added to 'Top N' with genre selection support
 
 ---
 
