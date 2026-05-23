@@ -5728,6 +5728,8 @@ class App:
                         for _root, _dirs, _files in os.walk(_dline):
                             for _fname in _files:
                                 _fpath = os.path.join(_root, _fname)
+                                if not os.path.isfile(_fpath):
+                                    continue
                                 _sz = format_size(os.path.getsize(_fpath))
                                 _dline_entries[_fname] = (_fname, _sz, None)
                     else:
@@ -5766,6 +5768,8 @@ class App:
                             for root, dirs, files in os.walk(local_source):
                                 for fname in files:
                                     fpath = os.path.join(root, fname)
+                                    if not os.path.isfile(fpath):
+                                        continue
                                     size_bytes = os.path.getsize(fpath)
                                     local_entries[fname] = (fname, format_size(size_bytes), None, True)
                         self._local_source_cache = (local_source, local_entries)
@@ -7932,8 +7936,9 @@ class App:
                 if _recursive:
                     for _root, _dirs, _files in os.walk(_dirpath):
                         for _fname in _files:
-                            if _fname not in local_map:
-                                local_map[_fname] = os.path.join(_root, _fname)
+                            _fpath = os.path.join(_root, _fname)
+                            if _fname not in local_map and os.path.isfile(_fpath):
+                                local_map[_fname] = _fpath
                 else:
                     for _fname in os.listdir(_dirpath):
                         _fpath = os.path.join(_dirpath, _fname)
