@@ -7821,7 +7821,9 @@ class App:
 
         self._save_settings()
 
-        urls     = [u.strip() for u in self.url_text.get('1.0', 'end').splitlines() if u.strip()]
+        _raw_dl_lines = [u.strip() for u in self.url_text.get('1.0', 'end').splitlines() if u.strip()]
+        urls          = [l for l in _raw_dl_lines if not os.path.isdir(l)]
+        dl_dir_lines  = [l for l in _raw_dl_lines if os.path.isdir(l)]
         dest_dir = self._get_dest_dir()
         access   = self.access.get() or None
         secret   = self.secret.get() or None
@@ -7920,12 +7922,23 @@ class App:
                 ))
 
             url_map   = {}
-            local_map = {}  # fname -> local path for files from local_source dir
+            local_map = {}  # fname -> absolute path, built from local_source + any dir_lines
+            _recursive = self.recursive_scan.get()
+            _scan_dirs = []
             if local_source and os.path.isdir(local_source):
-                for fname_l in os.listdir(local_source):
-                    fpath = os.path.join(local_source, fname_l)
-                    if os.path.isfile(fpath):
-                        local_map[fname_l] = fpath
+                _scan_dirs.append(local_source)
+            _scan_dirs.extend(dl_dir_lines)
+            for _dirpath in _scan_dirs:
+                if _recursive:
+                    for _root, _dirs, _files in os.walk(_dirpath):
+                        for _fname in _files:
+                            if _fname not in local_map:
+                                local_map[_fname] = os.path.join(_root, _fname)
+                else:
+                    for _fname in os.listdir(_dirpath):
+                        _fpath = os.path.join(_dirpath, _fname)
+                        if os.path.isfile(_fpath) and _fname not in local_map:
+                            local_map[_fname] = _fpath
             for base_url in urls:
                 base_url_stripped = base_url.split('#')[0].rstrip('/')
                 for data in self.rom_dict.values():
