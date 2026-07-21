@@ -49,6 +49,7 @@ ENGLISH_COUNTRIES = {
     'Australia', 'AUS', 'Canada', 'CAN',
     'New Zealand', 'NZ', 'Ireland', 'IRE',
 }
+JAPANESE_COUNTRIES = {'Japan', 'J'}
 EXCLUDE_ATTRIBUTES  = {'Demo', 'Cheat', 'Kiosk', 'Beta', 'Alpha', 'Proto', 'Prototype', 'Sample', 'Update'}
 EXCLUDE_TITLE_WORDS = {'Magazine', 'Demo Disk', 'Demo Disc', 'Bonus Disk', 'Bonus Disc',
                        'Covermount', 'OXM', 'Tips', 'Tricks'}
@@ -362,6 +363,28 @@ def select_best(instances: list) -> dict | None:
                 best = max(non_excl, key=rev_key)
             else:
                 return None
+    return {'filename': best['filename'], 'size': best['size']}
+
+
+def select_best_english(instances: list) -> dict | None:
+    """Best English-language/-region candidate, or None if no English variant exists."""
+    non_excl = [i for i in instances if not is_excluded(i)]
+    pool = [i for i in non_excl
+            if 'En' in i['languages'] or is_english_fan_translation(i)]
+    if not pool:
+        return None
+    best = max(pool, key=rev_key)
+    return {'filename': best['filename'], 'size': best['size']}
+
+
+def select_best_japanese(instances: list) -> dict | None:
+    """Best Japanese-language/-region candidate, or None if no Japanese variant exists."""
+    non_excl = [i for i in instances if not is_excluded(i)]
+    pool = [i for i in non_excl
+            if 'Ja' in i['languages'] or i['countries'] & JAPANESE_COUNTRIES]
+    if not pool:
+        return None
+    best = max(pool, key=rev_key)
     return {'filename': best['filename'], 'size': best['size']}
 
 
@@ -5333,8 +5356,9 @@ class App:
     def _apply_filter(self, file_entries: list, mode: str) -> tuple[dict, dict]:
         """Apply 1G1R/All filtering to raw file entries. Returns (rom_dict, summary)."""
         self._debug(f'[_apply_filter] start: {len(file_entries)} entries, mode={mode!r}')
-        use_1g1r     = mode in ('1G1R', '1G1R English only')
+        use_1g1r     = mode in ('1G1R', '1G1R English only', '1G1R English + Japanese')
         english_only = mode == '1G1R English only'
+        english_jp   = mode == '1G1R English + Japanese'
 
         rom_dict = defaultdict(list)
         for entry in sorted(file_entries, key=lambda x: x[0]):
@@ -5405,6 +5429,60 @@ class App:
                         text=f'Filtering {c}/{t} titles…', fg=YELLOW))
             for inst in instances:
                 total_all_bytes += parse_size_bytes(inst['size'])
+
+            if english_jp:
+                # Pick the best English variant and the best Japanese variant
+                # independently — up to two selections per title ("1G2R" when
+                # both exist, "1G1R" when only one language is available).
+                best_en = select_best_english(instances)
+                best_jp = select_best_japanese(instances)
+                if best_en and best_jp and best_en['filename'] == best_jp['filename']:
+                    picks = [(title, best_en)]
+                else:
+                    picks = []
+                    if best_en:
+                        picks.append((title, best_en))
+                    if best_jp:
+                        picks.append((f'{title} (Japan)' if best_en else title, best_jp))
+
+                if not picks:
+                    non_english_count += 1
+                    for inst in instances:
+                        non_english_bytes += parse_size_bytes(inst['size'])
+                    continue
+
+                kept_filenames = {p[1]['filename'] for p in picks}
+                for inst in instances:
+                    if inst['filename'] not in kept_filenames and not is_excluded(inst):
+                        unselected_other_bytes += parse_size_bytes(inst['size'])
+                        unselected_other_count += 1
+                    elif is_excluded(inst):
+                        excluded_files += 1
+                        excluded_bytes += parse_size_bytes(inst['size'])
+
+                for i, (key, selected) in enumerate(picks):
+                    sel_inst = next(
+                        (inst for inst in instances if inst['filename'] == selected['filename']), None)
+                    if not sel_inst:
+                        continue
+                    if self._is_locally_owned(sel_inst['filename']):
+                        self._debug(f'[locally_owned] skipping {sel_inst["filename"]!r}')
+                        continue
+                    sel_entry = {'filename':   sel_inst['filename'],
+                                 'size':       sel_inst['size'],
+                                 'direct_url': sel_inst.get('direct_url')}
+                    selected_count += 1
+                    selected_bytes += parse_size_bytes(selected['size'])
+                    result[key] = {
+                        'selected':    sel_entry,
+                        'non_english': False,
+                        'translated':  is_english_fan_translation(sel_inst),
+                        # Only the first (primary) pick shows the full instance
+                        # list — the secondary pick is a single-file group so
+                        # the analysis list doesn't double-list every variant.
+                        'instances':   instances if i == 0 else [sel_inst],
+                    }
+                continue
 
             if use_1g1r:
                 selected    = select_best(instances)
@@ -5862,6 +5940,8 @@ class App:
             self.lbl_list_title.config(text='DAT selection:')
         elif mode == '1G1R English only':
             self.lbl_list_title.config(text='Selected titles (1G1R — English only):')
+        elif mode == '1G1R English + Japanese':
+            self.lbl_list_title.config(text='Selected titles (1G1R — English + Japanese):')
         elif mode == '1G1R':
             self.lbl_list_title.config(text='Selected titles (1G1R):')
         elif mode == 'None':
@@ -5922,11 +6002,12 @@ class App:
         self.lbl_list_title.pack(side='left', anchor='w')
 
         # Mode selector + DAT browse in one row
-        MODE_OPTIONS = ['1G1R English only', '1G1R', 'All files', 'None', 'DAT', 'Top N']
+        MODE_OPTIONS = ['1G1R English only', '1G1R English + Japanese', '1G1R',
+                        'All files', 'None', 'DAT', 'Top N']
         self.mode_combo = ttk.Combobox(
             list_hdr, textvariable=self.mode,
             values=MODE_OPTIONS, state='readonly',
-            font=FONT_SM, width=18,
+            font=FONT_SM, width=24,
         )
         self.mode_combo.pack(side='right', padx=(4, 0))
         tk.Label(list_hdr, text='Mode:', bg=BG, fg=FG,
