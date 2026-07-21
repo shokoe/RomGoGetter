@@ -99,6 +99,7 @@ The core mode. For each game title, picks one ROM: English preferred, highest re
 | Mode | Description |
 |------|-------------|
 | `1G1R English only` | One ROM per game, English/Western regions only, prefers multiple languages |
+| `1G1R English + Japanese` | One ROM per game per language — the best English variant and the best Japanese variant, if it exists and differs from the English pick (effectively "1G2R" for games released in both) |
 | `1G1R` | One ROM per game, best available region |
 | `All files` | Every game ROM file selected |
 | `None` | All files shown, none pre-selected — toggle manually |
