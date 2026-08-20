@@ -971,7 +971,7 @@ def fetch_lolroms_filenames(url: str) -> tuple[list, str | None]:
         file_list_block = file_list_block[:ul_end.start()]
 
     results = []
-    for li in re.findall(r'<li[^>]*class=["\']file-item["\'][^>]*>(.*?)</li>',
+    for li in re.findall(r'<li[^>]*class=["\'](?:filei|file-item)["\'][^>]*>(.*?)</li>',
                          file_list_block, re.DOTALL | re.IGNORECASE):
         href_match = re.search(r'\bhref=["\']([^"\']+)["\']', li, re.IGNORECASE)
         if not href_match:
@@ -984,17 +984,24 @@ def fetch_lolroms_filenames(url: str) -> tuple[list, str | None]:
         else:
             lolroms_href = href
 
-        # Filename: prefer span text inside file-link (new structure),
-        # fall back to last path component of href (old structure)
+        ext = os.path.splitext(unquote(lolroms_href.split('/')[-1]))[1]
+
+        # Filename: prefer span text inside file-link (older structure);
+        # current structure has plain text after an <img> inside <a class="file">;
+        # fall back to last path component of href if neither is found
         span_m = re.search(r'class=["\']file-link["\'][^>]*>.*?<span>([^<]+)</span>', li, re.DOTALL | re.IGNORECASE)
         if span_m:
-            ext = os.path.splitext(unquote(lolroms_href.split('/')[-1]))[1]
             fname = html.unescape(span_m.group(1).strip()) + ext
         else:
-            fname = html.unescape(unquote(lolroms_href.split('/')[-1]))
+            a_m = re.search(r'<a[^>]*class=["\']file["\'][^>]*>(.*?)</a>', li, re.DOTALL | re.IGNORECASE)
+            text = html.unescape(re.sub(r'<[^>]+>', '', a_m.group(1))).strip() if a_m else ''
+            fname = (text + ext) if text else html.unescape(unquote(lolroms_href.split('/')[-1]))
 
-        # Size: first span inside file-meta (new), or class="file-size" span (old)
-        size_m = re.search(r'class=["\']file-meta["\'][^>]*>.*?<span>([^<]+)</span>', li, re.DOTALL | re.IGNORECASE)
+        # Size: first span inside class="meta" (current), class="file-meta" or
+        # class="file-size" span (older structures)
+        size_m = re.search(r'class=["\']meta["\'][^>]*>\s*<span>([^<]+)</span>', li, re.DOTALL | re.IGNORECASE)
+        if not size_m:
+            size_m = re.search(r'class=["\']file-meta["\'][^>]*>.*?<span>([^<]+)</span>', li, re.DOTALL | re.IGNORECASE)
         if not size_m:
             size_m = re.search(r'<span\s+class=["\']file-size["\']>(.*?)</span>', li, re.IGNORECASE)
         size_str = html.unescape(size_m.group(1)).strip() if size_m else ''
@@ -3902,7 +3909,7 @@ class App:
             try:
                 t0 = time.time()
                 entries, title = fetch_lolroms_filenames(
-                    'https://lolroms.com/Sega%20-%20Dreamcast/')
+                    'https://lolroms.com/SEGA/DreamCast')
                 sentinel = 'Crazy Taxi (Europe)'
                 ms = int((time.time() - t0) * 1000)
                 found = any(sentinel in e[0] for e in entries)
